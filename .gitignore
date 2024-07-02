@@ -1,7 +1,0 @@
-.env
-.idea
-instance
-__pycache__
-.gitignore
-test.py
-.venv
