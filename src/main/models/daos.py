@@ -1,0 +1,58 @@
+from src.main.error_handlers import NotFoundException
+from src.main.extention import db
+from src.main.models.models import Paper, Lexeme
+from src.main.models.schemas import papers_schema, lexemes_schema
+
+
+class BaseDao:
+    @staticmethod
+    def persist(data: dict, schema) -> dict:
+        obj = schema.load(data)
+        db.session.add(obj)
+        db.session.commit()
+        return schema.dump(obj)
+
+    @staticmethod
+    def update(id, data: dict, schema) -> dict:
+        obj = db.session.query(schema.Meta.model).filter_by(id=id).first()
+
+        if obj is None:
+            raise NotFoundException("Object with id {} not found".format(id))
+        updated_obj = schema.load(data, instance=obj)
+        db.session.commit()
+        return schema.dump(updated_obj)
+
+    @staticmethod
+    def delete(model, obj_id) -> None:
+        db.session.query(model).filter(model.id == obj_id).delete()
+        db.session.commit()
+
+    @staticmethod
+    def get_all(schema) -> list[dict]:
+        objects = db.session.query(schema.Meta.model).all()
+        return schema.dump(objects)
+
+    @staticmethod
+    def get_by_id() -> dict:
+        ...
+
+
+class CollectionDAO(BaseDao):
+    ...
+
+
+class PaperDAO(BaseDao):
+    def get_by_collection_id(self, collection_id: int) -> list[dict]:
+        papers = db.session.query(Paper).filter(Paper.collection_id == collection_id).all()
+        return papers_schema.dump(papers)
+
+
+class LexemeDAO(BaseDao):
+    def get_by_paper_id(self, paper_id: int) -> list[dict]:
+        lexemes = db.session.query(Lexeme).filter(Lexeme.paper_id == paper_id).all()
+        return lexemes_schema.dump(lexemes)
+
+
+lexeme_dao = LexemeDAO()
+collection_dao = CollectionDAO()
+paper_dao = PaperDAO()

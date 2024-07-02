@@ -1,5 +1,32 @@
-from flask import Blueprint
+from flask import Blueprint, request
 
-folder = Blueprint('folder_bp', __name__, url_prefix='/folder')
+from src.main.common import generate_response
+from src.main.models.services.CollectionService import collection_service
 
-# todo
+collection_bp = Blueprint('collection_bp', __name__, url_prefix='/collection')
+
+
+@collection_bp.route('/get_all', methods=['GET'])
+def get_all_collections():
+    collections = collection_service.get_all_collections()
+    return generate_response(200, collections)
+
+
+@collection_bp.route('/create', methods=['POST'])
+def create_collection():
+    data = request.get_json()
+    new_collection = collection_service.create_collection(data)
+    return generate_response(201, new_collection)
+
+
+@collection_bp.route('/delete/<int:id>', methods=['DELETE'])
+def delete_collection(id):
+    collection_service.delete_collection(id)
+    return generate_response(204)
+
+
+@collection_bp.route('/update/<int:id>', methods=['PUT'])
+def update_collection(id):
+    data = request.get_json()
+    new_collection = collection_service.update_collection(id, data)
+    return generate_response(200, new_collection)
