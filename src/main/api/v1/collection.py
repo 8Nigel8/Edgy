@@ -1,4 +1,5 @@
 from flask import Blueprint, request
+from flask_jwt_extended import jwt_required, get_jwt_identity
 
 from src.main.common import generate_response
 from src.main.models.services.CollectionService import collection_service
@@ -13,8 +14,11 @@ def get_all_collections():
 
 
 @collection_bp.route('/create', methods=['POST'])
+@jwt_required()
 def create_collection():
+    user_id = get_jwt_identity()
     data = request.get_json()
+    data['user_id'] = user_id
     new_collection = collection_service.create_collection(data)
     return generate_response(201, new_collection)
 

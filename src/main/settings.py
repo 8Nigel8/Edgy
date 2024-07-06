@@ -1,13 +1,14 @@
 from flask import Flask
 from flask_cors import CORS
 
+from src.main.api.v1.auth import auth_bp
 from src.main.api.v1.collection import collection_bp
 from src.main.api.v1.lexeme import lexeme_bp
 from src.main.api.v1.paper import paper_bp
 from src.main.config import config
 from src.main.consts import API_VERSION
 from src.main.error_handlers import add_error_handlers
-from src.main.extention import db
+from src.main.extention import db, jwt
 
 
 class __PrefixMiddleware(object):
@@ -34,11 +35,13 @@ def create_app(env):
     app.config.from_object(config)
 
     db.init_app(app)
+    jwt.init_app(app)
     CORS(app)
 
     app.register_blueprint(collection_bp)
     app.register_blueprint(paper_bp)
     app.register_blueprint(lexeme_bp)
+    app.register_blueprint(auth_bp)
 
     add_error_handlers(app, env)
     return app

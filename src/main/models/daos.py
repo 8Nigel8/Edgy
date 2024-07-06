@@ -1,7 +1,7 @@
 from src.main.error_handlers import NotFoundException
 from src.main.extention import db
-from src.main.models.models import Paper, Lexeme
-from src.main.models.schemas import papers_schema, lexemes_schema
+from src.main.models.models import Paper, Lexeme, User
+from src.main.models.schemas import papers_schema, lexemes_schema, user_authentication_schema
 
 
 class BaseDao:
@@ -53,6 +53,15 @@ class LexemeDAO(BaseDao):
         return lexemes_schema.dump(lexemes)
 
 
+class UsersDAO(BaseDao):
+    def get_by_username_for_login(self, username: str) -> list[dict]:
+        user = db.session.query(User).filter(User.username == username).first()
+        if user is None:
+            raise NotFoundException("User not found")
+        return user_authentication_schema.dump(user)
+
+
+users_dao = UsersDAO()
 lexeme_dao = LexemeDAO()
 collection_dao = CollectionDAO()
 paper_dao = PaperDAO()
