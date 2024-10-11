@@ -7,7 +7,7 @@ class Collection(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(MAX_NAME_LENGTH), nullable=False)
     description = db.Column(db.String(1000), nullable=False)
-    user_id = db.Column(db.Integer, db.ForeignKey('user'))
+    user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
 
     papers = db.relationship('Paper', back_populates='collection')
     user = db.relationship('User', back_populates='collections')

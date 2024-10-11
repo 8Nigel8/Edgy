@@ -1,7 +1,9 @@
+from sqlalchemy import and_
+
 from src.main.error_handlers import NotFoundException
 from src.main.extention import db
-from src.main.models.models import Paper, Lexeme, User
-from src.main.models.schemas import papers_schema, lexemes_schema, user_authentication_schema
+from src.main.models.models import Paper, Lexeme, User, Collection
+from src.main.models.schemas import papers_schema, lexemes_schema, user_authentication_schema, collections_schema
 
 
 class BaseDao:
@@ -38,7 +40,19 @@ class BaseDao:
 
 
 class CollectionDAO(BaseDao):
-    ...
+    def get_all(self, user_id) -> list[dict]:
+        collections = db.session.query(Collection).filter(Collection.user_id == user_id).all()
+        return collections_schema.dump(collections)
+
+    def delete(self, collection_id, user_id) -> None:
+        db.session.query(Collection) \
+            .filter(
+                and_(
+                    (Collection.id == collection_id),
+                    (Collection.user_id == user_id)
+                )
+            ).delete()
+        db.session.commit()
 
 
 class PaperDAO(BaseDao):

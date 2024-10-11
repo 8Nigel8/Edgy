@@ -15,6 +15,7 @@ class CollectionSchema(SQLAlchemySchema):
     id = auto_field(dump_only=True)
     name = auto_field()
     description = auto_field()
+    user_id = auto_field()
 
     @validates('name')
     def validate_name(self, value):

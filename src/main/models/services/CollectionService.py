@@ -8,12 +8,12 @@ class CollectionService:
         new_collection = collection_dao.persist(data, collection_schema)
         return new_collection
 
-    def get_all_collections(self):
-        collections = collection_dao.get_all(collections_schema)
+    def get_all_collections(self, user_id):
+        collections = collection_dao.get_all(user_id)
         return collections
 
-    def delete_collection(self, id):
-        collection_dao.delete(Collection, id)
+    def delete_collection(self, collection_id, user_id):
+        collection_dao.delete(collection_id, user_id)
 
     def update_collection(self, id, data):
         updated_collection = collection_dao.update(id, data, collection_schema)

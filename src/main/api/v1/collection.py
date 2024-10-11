@@ -8,8 +8,10 @@ collection_bp = Blueprint('collection_bp', __name__, url_prefix='/collection')
 
 
 @collection_bp.route('/get_all', methods=['GET'])
+@jwt_required()
 def get_all_collections():
-    collections = collection_service.get_all_collections()
+    user_id = get_jwt_identity()
+    collections = collection_service.get_all_collections(user_id)
     return generate_response(200, collections)
 
 
@@ -23,9 +25,11 @@ def create_collection():
     return generate_response(201, new_collection)
 
 
-@collection_bp.route('/delete/<int:id>', methods=['DELETE'])
-def delete_collection(id):
-    collection_service.delete_collection(id)
+@collection_bp.route('/delete/<int:collection_id>', methods=['DELETE'])
+@jwt_required()
+def delete_collection(collection_id):
+    user_id = get_jwt_identity()
+    collection_service.delete_collection(collection_id, user_id)
     return generate_response(204)
 
 
